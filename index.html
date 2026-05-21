@@ -7,341 +7,203 @@
 <title>국찜 QSC</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* GAS iframe 강제 리셋 */
+/* ── 아래 GAS_URL을 배포 후 실제 주소로 교체 ── */
+/* GAS_URL 변수는 script 태그 안에 있음 */
+
 html, body {
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  overflow-x: hidden !important;
-  background: #F1F8E9 !important;
-  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif !important;
-  font-size: 14px;
-  color: #1A1A1A;
+  margin: 0; padding: 0; border: 0;
+  width: 100%; height: 100%;
+  overflow-x: hidden;
+  background: #F1F8E9;
+  font-family: 'Noto Sans KR', -apple-system, sans-serif;
+  font-size: 14px; color: #1A1A1A;
   -webkit-text-size-adjust: 100%;
 }
-* {
-  box-sizing: border-box !important;
-  margin: 0;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
-}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-/* 전체 앱 래퍼 - iframe 내부에서 100% 차지 */
-#app {
-  width: 100%;
-  min-height: 100vh;
-  background: #F1F8E9;
-  position: relative;
-}
+#app { width: 100%; min-height: 100vh; background: #F1F8E9; }
 
-/* ── 상단 헤더 ── */
+/* 헤더 */
 #hdr {
-  width: 100%;
-  background: #2E7D32;
+  width: 100%; background: #2E7D32;
   padding: 14px 16px 11px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
 }
-#hdr h1 { color: #fff; font-size: 15px; font-weight: 700; line-height: 1.3; }
-#hdr p  { color: rgba(255,255,255,0.72); font-size: 11px; margin-top: 2px; }
-#pbar   { height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; margin-top: 9px; }
-#pfill  { height: 100%; background: #00E676; border-radius: 2px; width: 0; transition: width .3s; }
+#hdr h1 { color:#fff; font-size:15px; font-weight:700; margin:0; line-height:1.3; }
+#hdr p  { color:rgba(255,255,255,.7); font-size:11px; margin:2px 0 0; }
+#pbar   { height:3px; background:rgba(255,255,255,.2); border-radius:2px; margin-top:9px; }
+#pfill  { height:100%; background:#00E676; border-radius:2px; width:0; transition:width .3s; }
 
-/* ── 카테고리 탭 ── */
+/* 탭 */
 #tabs {
-  display: none;
-  width: 100%;
-  background: #fff;
-  border-bottom: 1px solid #C8E6C9;
-  overflow-x: auto;
-  white-space: nowrap;
-  padding: 9px 12px;
-  position: sticky;
-  top: 70px;
-  z-index: 90;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  display:none; width:100%; background:#fff;
+  border-bottom:1px solid #C8E6C9;
+  overflow-x:auto; white-space:nowrap;
+  padding:9px 12px;
+  position:sticky; top:70px; z-index:90;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
 }
-#tabs::-webkit-scrollbar { display: none; }
+#tabs::-webkit-scrollbar { display:none; }
 .tab {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 7px 13px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  font-family: inherit;
-  border: 1.5px solid #C8E6C9;
-  background: #fff;
-  color: #666;
-  cursor: pointer;
-  margin-right: 7px;
-  white-space: nowrap;
+  display:inline-flex; align-items:center; gap:4px;
+  padding:7px 13px; border-radius:20px;
+  font-size:12px; font-weight:600; font-family:inherit;
+  border:1.5px solid #C8E6C9; background:#fff; color:#666;
+  cursor:pointer; margin-right:7px; white-space:nowrap;
 }
-.tab.on { background: #2E7D32; color: #fff; border-color: #2E7D32; }
-.badge {
-  background: rgba(0,0,0,0.1);
-  border-radius: 10px;
-  font-size: 10px;
-  padding: 1px 5px;
-}
-.tab.on .badge { background: rgba(255,255,255,0.25); }
+.tab.on { background:#2E7D32; color:#fff; border-color:#2E7D32; }
+.badge  { background:rgba(0,0,0,.1); border-radius:10px; font-size:10px; padding:1px 5px; }
+.tab.on .badge { background:rgba(255,255,255,.25); }
 
-/* ── 화면 ── */
-.scr { display: none; width: 100%; padding: 14px 14px 96px; }
-.scr.on { display: block; }
+/* 화면 */
+.scr { display:none; width:100%; padding:14px 14px 96px; }
+.scr.on { display:block; }
 
-/* ── 카드 ── */
+/* 카드 */
 .card {
-  width: 100%;
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 1px 8px rgba(0,0,0,0.07);
-  padding: 18px 16px;
-  margin-bottom: 12px;
+  width:100%; background:#fff;
+  border-radius:14px;
+  box-shadow:0 1px 8px rgba(0,0,0,.07);
+  padding:18px 16px; margin-bottom:12px;
 }
 
-/* ────────────────────────
-   기본정보 화면
-──────────────────────── */
-.pg-ttl  { font-size: 20px; font-weight: 700; color: #2E7D32; margin-bottom: 5px; }
-.pg-desc { font-size: 13px; color: #777; margin-bottom: 22px; line-height: 1.5; }
-
-.fld { margin-bottom: 18px; }
-.fld:last-child { margin-bottom: 0; }
-.fld label {
-  display: block;
-  font-size: 12px;
-  font-weight: 700;
-  color: #2E7D32;
-  letter-spacing: 0.3px;
-  margin-bottom: 7px;
-}
+/* 기본정보 */
+.pg-ttl  { font-size:20px; font-weight:700; color:#2E7D32; margin-bottom:5px; }
+.pg-desc { font-size:13px; color:#777; margin-bottom:22px; line-height:1.5; }
+.fld { margin-bottom:18px; }
+.fld:last-child { margin-bottom:0; }
+.fld label { display:block; font-size:12px; font-weight:700; color:#2E7D32; margin-bottom:7px; }
 .fld input {
-  display: block;
-  width: 100%;
-  padding: 14px 15px;
-  border: 1.5px solid #C8E6C9;
-  border-radius: 10px;
-  font-size: 16px;          /* iOS zoom 방지 핵심 */
-  font-family: inherit;
-  color: #1A1A1A;
-  background: #fff;
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-  transition: border-color .2s;
+  display:block; width:100%;
+  padding:14px 15px;
+  border:1.5px solid #C8E6C9; border-radius:10px;
+  font-size:16px; font-family:inherit; color:#1A1A1A; background:#fff;
+  outline:none; -webkit-appearance:none; appearance:none;
+  transition:border-color .2s;
 }
-.fld input:focus  { border-color: #43A047; }
-.fld input::placeholder { color: #bbb; font-size: 14px; }
+.fld input:focus { border-color:#43A047; }
+.fld input::placeholder { color:#bbb; font-size:14px; }
 
-/* ────────────────────────
-   체크 아이템
-──────────────────────── */
+/* 체크 아이템 */
 .sec-hd {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  background: #E8F5E9;
-  border-radius: 9px;
-  padding: 10px 13px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #2E7D32;
-  margin-bottom: 9px;
+  display:flex; align-items:center; gap:7px;
+  background:#E8F5E9; border-radius:9px;
+  padding:10px 13px; font-size:13px; font-weight:700; color:#2E7D32;
+  margin-bottom:9px;
 }
-.sec-hd::before {
-  content: '';
-  width: 4px; height: 16px;
-  background: #43A047;
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-
+.sec-hd::before { content:''; width:4px; height:16px; background:#43A047; border-radius:2px; flex-shrink:0; }
 .ci {
-  width: 100%;
-  background: #fff;
-  border-radius: 11px;
-  border: 1.5px solid #eee;
-  padding: 13px 12px 11px;
-  margin-bottom: 8px;
-  transition: border-color .15s, background .15s;
+  width:100%; background:#fff; border-radius:11px;
+  border:1.5px solid #eee; padding:13px 12px 11px;
+  margin-bottom:8px; transition:border-color .15s,background .15s;
 }
-.ci.o { border-color: #43A047; background: #F0FBF0; }
-.ci.x { border-color: #E53935; background: #FFEBEE; }
-
-.ci-txt {
-  font-size: 13px;
-  line-height: 1.6;
-  color: #222;
-  margin-bottom: 10px;
-  word-break: keep-all;
-}
-
-.ox { display: flex; gap: 8px; }
+.ci.o { border-color:#43A047; background:#F0FBF0; }
+.ci.x { border-color:#E53935; background:#FFEBEE; }
+.ci-txt { font-size:13px; line-height:1.6; color:#222; margin-bottom:10px; word-break:keep-all; }
+.ox { display:flex; gap:8px; }
 .oxb {
-  flex: 1;
-  padding: 10px 0;
-  border: 2px solid #ddd;
-  border-radius: 10px;
-  font-size: 18px;
-  font-weight: 800;
-  font-family: inherit;
-  color: #ccc;
-  background: #fafafa;
-  cursor: pointer;
-  transition: all .13s;
-  text-align: center;
+  flex:1; padding:10px 0; border:2px solid #ddd; border-radius:10px;
+  font-size:18px; font-weight:800; font-family:inherit;
+  color:#ccc; background:#fafafa; cursor:pointer;
+  transition:all .13s; text-align:center;
 }
-.oxb:active   { transform: scale(.93); }
-.oxb.so { background: #43A047; border-color: #43A047; color: #fff; }
-.oxb.sx { background: #E53935; border-color: #E53935; color: #fff; }
+.oxb:active { transform:scale(.93); }
+.oxb.so { background:#43A047; border-color:#43A047; color:#fff; }
+.oxb.sx { background:#E53935; border-color:#E53935; color:#fff; }
 
-/* ────────────────────────
-   점수 요약
-──────────────────────── */
+/* 점수 요약 */
 #sum-box {
-  width: 100%;
-  background: #2E7D32;
-  border-radius: 14px;
-  padding: 20px 18px;
-  color: #fff;
-  margin-bottom: 12px;
+  width:100%; background:#2E7D32; border-radius:14px;
+  padding:20px 18px; color:#fff; margin-bottom:12px;
 }
-#s-score { font-size: 42px; font-weight: 700; line-height: 1; }
-#s-max   { font-size: 15px; opacity: .65; margin-top: 4px; }
-#s-pct   { font-size: 13px; opacity: .8;  margin-top: 7px; }
-#s-bars  { margin-top: 14px; }
-.brow { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.blbl { font-size: 10px; width: 70px; text-align: right; opacity: .8; flex-shrink: 0; }
-.btrk { flex: 1; height: 5px; background: rgba(255,255,255,.2); border-radius: 3px; overflow: hidden; }
-.bfll { height: 100%; background: #00E676; border-radius: 3px; transition: width .5s; }
-.bval { font-size: 10px; width: 28px; opacity: .8; }
+#s-score { font-size:42px; font-weight:700; line-height:1; }
+#s-max   { font-size:15px; opacity:.65; margin-top:4px; }
+#s-pct   { font-size:13px; opacity:.8;  margin-top:7px; }
+#s-bars  { margin-top:14px; }
+.brow { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.blbl { font-size:10px; width:70px; text-align:right; opacity:.8; flex-shrink:0; }
+.btrk { flex:1; height:5px; background:rgba(255,255,255,.2); border-radius:3px; overflow:hidden; }
+.bfll { height:100%; background:#00E676; border-radius:3px; transition:width .5s; }
+.bval { font-size:10px; width:28px; opacity:.8; }
 
-/* ── 상담 내역 ── */
-.cf { margin-bottom: 14px; }
-.cf:last-child { margin-bottom: 0; }
-.cf label { display: block; font-size: 12px; font-weight: 700; color: #2E7D32; margin-bottom: 6px; }
+/* 상담내역 */
+.cf { margin-bottom:14px; }
+.cf:last-child { margin-bottom:0; }
+.cf label { display:block; font-size:12px; font-weight:700; color:#2E7D32; margin-bottom:6px; }
 .cf textarea {
-  width: 100%;
-  padding: 12px 13px;
-  border: 1.5px solid #C8E6C9;
-  border-radius: 10px;
-  font-size: 14px;
-  font-family: inherit;
-  resize: none;
-  height: 70px;
-  outline: none;
-  -webkit-appearance: none;
+  width:100%; padding:12px 13px;
+  border:1.5px solid #C8E6C9; border-radius:10px;
+  font-size:14px; font-family:inherit; resize:none; height:70px;
+  outline:none; -webkit-appearance:none;
 }
-.cf textarea:focus { border-color: #43A047; }
+.cf textarea:focus { border-color:#43A047; }
 
-/* ── 경고 ── */
+/* 경고 */
 #warn {
-  display: none;
-  background: #FFF8E1;
-  border: 1.5px solid #FFB300;
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 12px;
-  color: #E65100;
-  margin-bottom: 10px;
+  display:none; background:#FFF8E1;
+  border:1.5px solid #FFB300; border-radius:10px;
+  padding:12px 14px; font-size:12px; color:#E65100; margin-bottom:10px;
 }
 
-/* ── 완료 화면 ── */
-#done-inner { text-align: center; padding: 36px 16px; }
-.done-ico   { font-size: 60px; margin-bottom: 16px; }
-.done-ttl   { font-size: 22px; font-weight: 700; color: #2E7D32; margin-bottom: 10px; }
-.done-sub   { font-size: 13px; color: #777; line-height: 1.7; }
+/* 완료 */
+#done-inner { text-align:center; padding:36px 16px; }
+.done-ico { font-size:60px; margin-bottom:16px; }
+.done-ttl { font-size:22px; font-weight:700; color:#2E7D32; margin-bottom:10px; }
+.done-sub { font-size:13px; color:#777; line-height:1.7; }
 
-/* ── 하단 버튼 ── */
+/* 하단 버튼 */
 #bbar {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  width: 100%;
-  background: #fff;
-  padding: 11px 14px;
-  padding-bottom: max(11px, env(safe-area-inset-bottom));
-  box-shadow: 0 -2px 12px rgba(0,0,0,0.09);
-  z-index: 200;
+  position:fixed; bottom:0; left:0; right:0; width:100%;
+  background:#fff; padding:11px 14px;
+  padding-bottom:max(11px, env(safe-area-inset-bottom));
+  box-shadow:0 -2px 12px rgba(0,0,0,.09); z-index:200;
 }
 .btn {
-  display: block;
-  width: 100%;
-  padding: 15px;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  background: #2E7D32;
-  color: #fff;
-  letter-spacing: -0.2px;
-  transition: background .15s, transform .1s;
+  display:block; width:100%; padding:15px; border:none; border-radius:12px;
+  font-size:16px; font-weight:700; font-family:inherit; cursor:pointer;
+  background:#2E7D32; color:#fff; transition:background .15s,transform .1s;
 }
-.btn:active { transform: scale(.98); background: #1B5E20; }
-.btn.dim    { background: #81C784; }
+.btn:active { transform:scale(.98); background:#1B5E20; }
+.btn.dim    { background:#81C784; }
 
-/* ── 토스트 ── */
+/* 토스트 */
 #toast {
-  position: fixed;
-  bottom: 78px; left: 50%;
-  transform: translateX(-50%) translateY(8px);
-  background: rgba(0,0,0,0.78);
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 20px;
-  font-size: 13px;
-  opacity: 0;
-  transition: all .25s;
-  z-index: 400;
-  white-space: nowrap;
-  pointer-events: none;
+  position:fixed; bottom:78px; left:50%;
+  transform:translateX(-50%) translateY(8px);
+  background:rgba(0,0,0,.78); color:#fff;
+  padding:10px 20px; border-radius:20px; font-size:13px;
+  opacity:0; transition:all .25s; z-index:400;
+  white-space:nowrap; pointer-events:none;
 }
-#toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
 
-/* ── 로딩 ── */
+/* 로딩 */
 #lding {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.52);
-  z-index: 500;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.52); z-index:500;
+  flex-direction:column; align-items:center; justify-content:center;
+  gap:16px; color:#fff; font-size:14px; font-weight:600;
 }
-#lding.on { display: flex; }
+#lding.on { display:flex; }
 .spin {
-  width: 42px; height: 42px;
-  border: 4px solid rgba(255,255,255,0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: sp .8s linear infinite;
+  width:42px; height:42px;
+  border:4px solid rgba(255,255,255,.3); border-top-color:#fff;
+  border-radius:50%; animation:sp .8s linear infinite;
 }
-@keyframes sp { to { transform: rotate(360deg); } }
+@keyframes sp { to { transform:rotate(360deg); } }
 </style>
 </head>
 <body>
 <div id="app">
 
-<!-- 헤더 -->
 <div id="hdr">
   <h1>🟢 국민매운찜갈비 QSC</h1>
   <p id="hdr-sub">기본 정보를 입력하고 시작하세요</p>
   <div id="pbar"><div id="pfill"></div></div>
 </div>
 
-<!-- 카테고리 탭 -->
 <div id="tabs"></div>
 
 <!-- ① 기본정보 -->
@@ -351,11 +213,11 @@ html, body {
     <div class="pg-desc">QSC 체크 시작 전 아래 정보를 입력해주세요.</div>
     <div class="fld">
       <label>담당 슈퍼바이저</label>
-      <input type="text" id="i-sv" placeholder="이름을 입력하세요" autocomplete="off" autocorrect="off">
+      <input type="text" id="i-sv" placeholder="이름을 입력하세요" autocomplete="off">
     </div>
     <div class="fld">
       <label>매장명</label>
-      <input type="text" id="i-st" placeholder="예) 하양점" autocomplete="off" autocorrect="off">
+      <input type="text" id="i-st" placeholder="예) 하양점" autocomplete="off">
     </div>
     <div class="fld">
       <label>방문 날짜</label>
@@ -369,7 +231,7 @@ html, body {
   <div id="chk-body"></div>
 </div>
 
-<!-- ③ 상담내역 + 제출 -->
+<!-- ③ 상담내역 -->
 <div class="scr" id="s-sub">
   <div id="sum-box">
     <div id="s-score">-</div>
@@ -396,17 +258,16 @@ html, body {
   </div>
 </div>
 
-</div><!-- #app -->
+</div>
 
-<!-- 하단 버튼 -->
 <div id="bbar"><button class="btn" id="mbtn" onclick="doNext()">다음</button></div>
 <div id="toast"></div>
 <div id="lding"><div class="spin"></div><div>보고서 생성 중...</div></div>
 
 <script>
-/* ══════════════════════════════════════
-   체크리스트 데이터
-══════════════════════════════════════ */
+// ★★★ 아래 URL을 GAS 배포 후 실제 웹앱 URL로 교체하세요 ★★★
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwg8gP4kTr_bW49XUNDHUFWYN6YIkvkOnTgvBDhJmQvDtX3Z6aMIkh35jmyxU4u0HVu/exec";
+
 const CL = [
   { name:"음식 품질", subs:[
     { name:"냉장보관 (신선도)", items:[
@@ -503,60 +364,44 @@ const CL = [
   ]},
 ];
 
-/* ══════════════════════════════════════
-   상태
-══════════════════════════════════════ */
 const A = {};
-let curCat = 0, step = 0, warnShown = false, total = 0;
-CL.forEach((c,ci) => c.subs.forEach((s,si) => s.items.forEach((_,ii) => {
-  A[`${ci}-${si}-${ii}`] = null; total++;
+let curCat=0, step=0, warnShown=false, total=0;
+CL.forEach((c,ci)=>c.subs.forEach((s,si)=>s.items.forEach((_,ii)=>{
+  A[`${ci}-${si}-${ii}`]=null; total++;
 })));
 
-const $ = id => document.getElementById(id);
-const fmtDate = v => { const [y,m,d] = v.split('-'); return `${y.slice(2)}.${m}.${d}`; };
-const answered = () => Object.values(A).filter(Boolean).length;
-const catTotal = ci => CL[ci].subs.reduce((a,s) => a + s.items.length, 0);
-const catAnswered = ci => {
-  let n = 0;
-  CL[ci].subs.forEach((s,si) => s.items.forEach((_,ii) => { if(A[`${ci}-${si}-${ii}`]) n++; }));
-  return n;
-};
+const $=id=>document.getElementById(id);
+const fmtDate=v=>{const[y,m,d]=v.split('-');return`${y.slice(2)}.${m}.${d}`;};
+const answered=()=>Object.values(A).filter(Boolean).length;
+const catTotal=ci=>CL[ci].subs.reduce((a,s)=>a+s.items.length,0);
+const catAnswered=ci=>{let n=0;CL[ci].subs.forEach((s,si)=>s.items.forEach((_,ii)=>{if(A[`${ci}-${si}-${ii}`])n++;}));return n;};
 
-function showScr(id) {
-  document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
-  $(id).classList.add('on');
-  window.scrollTo(0, 0);
-}
-function toast(msg) {
-  const t = $('toast'); t.textContent = msg; t.classList.add('on');
-  setTimeout(() => t.classList.remove('on'), 2600);
-}
-function updProg() { $('pfill').style.width = Math.round(answered() / total * 100) + '%'; }
+function showScr(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');window.scrollTo(0,0);}
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2600);}
+function updProg(){$('pfill').style.width=Math.round(answered()/total*100)+'%';}
 
-/* ── 탭 ── */
-function renderTabs() {
-  const el = $('tabs'); el.innerHTML = '';
-  CL.forEach((c, ci) => {
-    const b = document.createElement('button');
-    b.className = 'tab' + (ci === curCat ? ' on' : '');
-    b.innerHTML = c.name + `<span class="badge">${catAnswered(ci)}/${catTotal(ci)}</span>`;
-    b.onclick = () => { curCat = ci; renderTabs(); renderChk(); window.scrollTo(0, 0); };
+function renderTabs(){
+  const el=$('tabs');el.innerHTML='';
+  CL.forEach((c,ci)=>{
+    const b=document.createElement('button');
+    b.className='tab'+(ci===curCat?' on':'');
+    b.innerHTML=c.name+`<span class="badge">${catAnswered(ci)}/${catTotal(ci)}</span>`;
+    b.onclick=()=>{curCat=ci;renderTabs();renderChk();window.scrollTo(0,0);};
     el.appendChild(b);
   });
 }
 
-/* ── 체크리스트 ── */
-function renderChk() {
-  const el = $('chk-body'); el.innerHTML = '';
-  CL[curCat].subs.forEach((sub, si) => {
-    const hd = document.createElement('div');
-    hd.className = 'sec-hd'; hd.textContent = sub.name; el.appendChild(hd);
-    sub.items.forEach((txt, ii) => {
-      const key = `${curCat}-${si}-${ii}`, ans = A[key];
-      const d = document.createElement('div');
-      d.className = 'ci' + (ans === 'O' ? ' o' : ans === 'X' ? ' x' : '');
-      d.id = 'ci-' + key;
-      d.innerHTML = `<div class="ci-txt">${txt}</div>
+function renderChk(){
+  const el=$('chk-body');el.innerHTML='';
+  CL[curCat].subs.forEach((sub,si)=>{
+    const hd=document.createElement('div');
+    hd.className='sec-hd';hd.textContent=sub.name;el.appendChild(hd);
+    sub.items.forEach((txt,ii)=>{
+      const key=`${curCat}-${si}-${ii}`,ans=A[key];
+      const d=document.createElement('div');
+      d.className='ci'+(ans==='O'?' o':ans==='X'?' x':'');
+      d.id='ci-'+key;
+      d.innerHTML=`<div class="ci-txt">${txt}</div>
         <div class="ox">
           <button class="oxb${ans==='O'?' so':''}" onclick="pick('${key}','O',this)">O</button>
           <button class="oxb${ans==='X'?' sx':''}" onclick="pick('${key}','X',this)">X</button>
@@ -566,136 +411,124 @@ function renderChk() {
   });
 }
 
-/* ── O/X 선택 ── */
-function pick(key, val, btn) {
-  A[key] = A[key] === val ? null : val;
-  const ans = A[key];
-  const d = $('ci-' + key);
-  d.className = 'ci' + (ans === 'O' ? ' o' : ans === 'X' ? ' x' : '');
-  d.querySelectorAll('.oxb').forEach(b => b.classList.remove('so','sx'));
-  if (ans === 'O') d.querySelector('.oxb:first-child').classList.add('so');
-  if (ans === 'X') d.querySelector('.oxb:last-child').classList.add('sx');
-  renderTabs(); updProg(); updBtn();
+function pick(key,val,btn){
+  A[key]=A[key]===val?null:val;
+  const ans=A[key];
+  const d=$('ci-'+key);
+  d.className='ci'+(ans==='O'?' o':ans==='X'?' x':'');
+  d.querySelectorAll('.oxb').forEach(b=>b.classList.remove('so','sx'));
+  if(ans==='O')d.querySelector('.oxb:first-child').classList.add('so');
+  if(ans==='X')d.querySelector('.oxb:last-child').classList.add('sx');
+  renderTabs();updProg();updBtn();
 }
 
-/* ── 버튼 레이블 ── */
-function updBtn() {
-  const b = $('mbtn');
-  if (step !== 1) return;
-  if (curCat < CL.length - 1) {
-    b.textContent = '다음 카테고리 →'; b.className = 'btn';
-  } else {
-    const an = answered();
-    b.textContent = an === total ? '상담내역 작성 →' : `상담내역 작성 (${an}/${total})`;
-    b.className = an === total ? 'btn' : 'btn dim';
+function updBtn(){
+  const b=$('mbtn');
+  if(step!==1)return;
+  if(curCat<CL.length-1){b.textContent='다음 카테고리 →';b.className='btn';}
+  else{
+    const an=answered();
+    b.textContent=an===total?'상담내역 작성 →':`상담내역 작성 (${an}/${total})`;
+    b.className=an===total?'btn':'btn dim';
   }
 }
 
-/* ── 점수 요약 ── */
-function renderSum() {
-  let sc = 0; Object.values(A).forEach(v => { if(v === 'O') sc++; });
-  $('s-score').textContent = sc;
-  $('s-max').textContent   = `/ ${total} 점`;
-  $('s-pct').textContent   = `달성률 ${Math.round(sc/total*100)}%`;
-  const bars = $('s-bars'); bars.innerHTML = '';
-  CL.forEach((c, ci) => {
-    const ct = catTotal(ci);
-    const cs = CL[ci].subs.reduce((a,s,si) =>
-      a + s.items.filter((_,ii) => A[`${ci}-${si}-${ii}`] === 'O').length, 0);
-    bars.innerHTML += `<div class="brow">
+function renderSum(){
+  let sc=0;Object.values(A).forEach(v=>{if(v==='O')sc++;});
+  $('s-score').textContent=sc;
+  $('s-max').textContent=`/ ${total} 점`;
+  $('s-pct').textContent=`달성률 ${Math.round(sc/total*100)}%`;
+  const bars=$('s-bars');bars.innerHTML='';
+  CL.forEach((c,ci)=>{
+    const ct=catTotal(ci);
+    const cs=CL[ci].subs.reduce((a,s,si)=>a+s.items.filter((_,ii)=>A[`${ci}-${si}-${ii}`]==='O').length,0);
+    bars.innerHTML+=`<div class="brow">
       <div class="blbl">${c.name}</div>
-      <div class="btrk"><div class="bfll" style="width:${ct ? Math.round(cs/ct*100) : 0}%"></div></div>
+      <div class="btrk"><div class="bfll" style="width:${ct?Math.round(cs/ct*100):0}%"></div></div>
       <div class="bval">${cs}/${ct}</div></div>`;
   });
 }
 
-/* ══════════════════════════════════════
-   화면 전환
-══════════════════════════════════════ */
-function doNext() {
-  if (step === 0) {
-    const sv = $('i-sv').value.trim(), st = $('i-st').value.trim(), dt = $('i-dt').value;
-    if (!sv || !st || !dt) { toast('모든 항목을 입력해주세요'); return; }
-    $('hdr-sub').textContent = `${st} · ${fmtDate(dt)} · ${sv}`;
-    step = 1; curCat = 0;
-    $('tabs').style.display = 'block';
-    renderTabs(); renderChk(); showScr('s-chk'); updBtn();
-  } else if (step === 1) {
-    if (curCat < CL.length - 1) {
-      curCat++; renderTabs(); renderChk(); window.scrollTo(0,0); updBtn();
-    } else {
-      step = 2;
-      $('tabs').style.display = 'none';
-      renderSum(); showScr('s-sub');
-      $('mbtn').textContent = '제출하기'; $('mbtn').className = 'btn';
+function doNext(){
+  if(step===0){
+    const sv=$('i-sv').value.trim(),st=$('i-st').value.trim(),dt=$('i-dt').value;
+    if(!sv||!st||!dt){toast('모든 항목을 입력해주세요');return;}
+    $('hdr-sub').textContent=`${st} · ${fmtDate(dt)} · ${sv}`;
+    step=1;curCat=0;
+    $('tabs').style.display='block';
+    renderTabs();renderChk();showScr('s-chk');updBtn();
+  } else if(step===1){
+    if(curCat<CL.length-1){curCat++;renderTabs();renderChk();window.scrollTo(0,0);updBtn();}
+    else{
+      step=2;$('tabs').style.display='none';
+      renderSum();showScr('s-sub');
+      $('mbtn').textContent='제출하기';$('mbtn').className='btn';
     }
-  } else if (step === 2) {
+  } else if(step===2){
     doSubmit();
   }
 }
 
-/* ══════════════════════════════════════
-   제출
-══════════════════════════════════════ */
-function doSubmit() {
-  const unan = Object.values(A).filter(v => !v).length;
-  if (unan > 0 && !warnShown) {
-    warnShown = true;
-    const w = $('warn'); w.style.display = 'block';
-    w.textContent = `⚠️ 미응답 항목이 ${unan}건 있습니다. 한 번 더 누르면 제출됩니다.`;
-    toast(`미응답 ${unan}건 — 다시 누르면 제출`); return;
+function doSubmit(){
+  const unan=Object.values(A).filter(v=>!v).length;
+  if(unan>0&&!warnShown){
+    warnShown=true;
+    const w=$('warn');w.style.display='block';
+    w.textContent=`⚠️ 미응답 항목이 ${unan}건 있습니다. 한 번 더 누르면 제출됩니다.`;
+    toast(`미응답 ${unan}건 — 다시 누르면 제출`);return;
   }
-  warnShown = false;
-  const sv = $('i-sv').value.trim(), st = $('i-st').value.trim(), dt = $('i-dt').value;
-  const payload = {
-    supervisor: sv, storeName: st, visitDate: fmtDate(dt),
-    consult: [$('c1').value, $('c2').value, $('c3').value],
-    categories: CL.map((c,ci) => ({
-      name: c.name,
-      subcategories: c.subs.map((s,si) => ({
-        name: s.name,
-        items: s.items.map((text,ii) => ({ text, answer: A[`${ci}-${si}-${ii}`] || 'X' }))
+  warnShown=false;
+  const sv=$('i-sv').value.trim(),st=$('i-st').value.trim(),dt=$('i-dt').value;
+  const payload={
+    supervisor:sv,storeName:st,visitDate:fmtDate(dt),
+    consult:[$('c1').value,$('c2').value,$('c3').value],
+    categories:CL.map((c,ci)=>({
+      name:c.name,
+      subcategories:c.subs.map((s,si)=>({
+        name:s.name,
+        items:s.items.map((text,ii)=>({text,answer:A[`${ci}-${si}-${ii}`]||'X'}))
       }))
     }))
   };
+
   $('lding').classList.add('on');
-  google.script.run
-    .withSuccessHandler(r => {
-      $('lding').classList.remove('on');
-      if (r.success) {
-        step = 3;
-        $('bbar').style.display = 'none';
-        $('tabs').style.display = 'none';
-        showScr('s-done');
-      } else { toast('오류: ' + r.error); }
-    })
-    .withFailureHandler(e => {
-      $('lding').classList.remove('on');
-      toast('실패: ' + e.message);
-    })
-    .submitQSC(payload);
+
+  // GitHub Pages → GAS fetch 통신
+  fetch(GAS_URL, {
+    method: 'POST',
+    mode: 'no-cors',   // GAS CORS 우회
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  })
+  .then(() => {
+    $('lding').classList.remove('on');
+    step=3;
+    $('bbar').style.display='none';
+    $('tabs').style.display='none';
+    showScr('s-done');
+  })
+  .catch(err => {
+    $('lding').classList.remove('on');
+    toast('전송 실패: ' + err.message);
+  });
 }
 
-/* ══════════════════════════════════════
-   리셋
-══════════════════════════════════════ */
-function doReset() {
-  Object.keys(A).forEach(k => A[k] = null);
-  step = 0; curCat = 0; warnShown = false;
-  ['i-sv','i-st'].forEach(id => $(id).value = '');
-  $('i-dt').value = new Date().toISOString().split('T')[0];
-  ['c1','c2','c3'].forEach(id => $(id).value = '');
-  $('pfill').style.width = '0%';
-  $('hdr-sub').textContent = '기본 정보를 입력하고 시작하세요';
-  $('warn').style.display = 'none';
-  $('bbar').style.display = 'block';
-  $('mbtn').textContent = '다음'; $('mbtn').className = 'btn';
-  $('tabs').style.display = 'none';
+function doReset(){
+  Object.keys(A).forEach(k=>A[k]=null);
+  step=0;curCat=0;warnShown=false;
+  ['i-sv','i-st'].forEach(id=>$(id).value='');
+  $('i-dt').value=new Date().toISOString().split('T')[0];
+  ['c1','c2','c3'].forEach(id=>$(id).value='');
+  $('pfill').style.width='0%';
+  $('hdr-sub').textContent='기본 정보를 입력하고 시작하세요';
+  $('warn').style.display='none';
+  $('bbar').style.display='block';
+  $('mbtn').textContent='다음';$('mbtn').className='btn';
+  $('tabs').style.display='none';
   showScr('s-info');
 }
 
-/* 초기화 */
-$('i-dt').value = new Date().toISOString().split('T')[0];
+$('i-dt').value=new Date().toISOString().split('T')[0];
 updProg();
 </script>
 </body>
