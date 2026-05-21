@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>국찜 QSC</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* GAS iframe 강제 리셋 */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow-x: hidden !important;
+  background: #F1F8E9 !important;
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 14px;
+  color: #1A1A1A;
+  -webkit-text-size-adjust: 100%;
+}
+* {
+  box-sizing: border-box !important;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 전체 앱 래퍼 - iframe 내부에서 100% 차지 */
+#app {
+  width: 100%;
+  min-height: 100vh;
+  background: #F1F8E9;
+  position: relative;
+}
+
+/* ── 상단 헤더 ── */
+#hdr {
+  width: 100%;
+  background: #2E7D32;
+  padding: 14px 16px 11px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+#hdr h1 { color: #fff; font-size: 15px; font-weight: 700; line-height: 1.3; }
+#hdr p  { color: rgba(255,255,255,0.72); font-size: 11px; margin-top: 2px; }
+#pbar   { height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; margin-top: 9px; }
+#pfill  { height: 100%; background: #00E676; border-radius: 2px; width: 0; transition: width .3s; }
+
+/* ── 카테고리 탭 ── */
+#tabs {
+  display: none;
+  width: 100%;
+  background: #fff;
+  border-bottom: 1px solid #C8E6C9;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 9px 12px;
+  position: sticky;
+  top: 70px;
+  z-index: 90;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+#tabs::-webkit-scrollbar { display: none; }
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 13px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  border: 1.5px solid #C8E6C9;
+  background: #fff;
+  color: #666;
+  cursor: pointer;
+  margin-right: 7px;
+  white-space: nowrap;
+}
+.tab.on { background: #2E7D32; color: #fff; border-color: #2E7D32; }
+.badge {
+  background: rgba(0,0,0,0.1);
+  border-radius: 10px;
+  font-size: 10px;
+  padding: 1px 5px;
+}
+.tab.on .badge { background: rgba(255,255,255,0.25); }
+
+/* ── 화면 ── */
+.scr { display: none; width: 100%; padding: 14px 14px 96px; }
+.scr.on { display: block; }
+
+/* ── 카드 ── */
+.card {
+  width: 100%;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+  padding: 18px 16px;
+  margin-bottom: 12px;
+}
+
+/* ────────────────────────
+   기본정보 화면
+──────────────────────── */
+.pg-ttl  { font-size: 20px; font-weight: 700; color: #2E7D32; margin-bottom: 5px; }
+.pg-desc { font-size: 13px; color: #777; margin-bottom: 22px; line-height: 1.5; }
+
+.fld { margin-bottom: 18px; }
+.fld:last-child { margin-bottom: 0; }
+.fld label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #2E7D32;
+  letter-spacing: 0.3px;
+  margin-bottom: 7px;
+}
+.fld input {
+  display: block;
+  width: 100%;
+  padding: 14px 15px;
+  border: 1.5px solid #C8E6C9;
+  border-radius: 10px;
+  font-size: 16px;          /* iOS zoom 방지 핵심 */
+  font-family: inherit;
+  color: #1A1A1A;
+  background: #fff;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color .2s;
+}
+.fld input:focus  { border-color: #43A047; }
+.fld input::placeholder { color: #bbb; font-size: 14px; }
+
+/* ────────────────────────
+   체크 아이템
+──────────────────────── */
+.sec-hd {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #E8F5E9;
+  border-radius: 9px;
+  padding: 10px 13px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2E7D32;
+  margin-bottom: 9px;
+}
+.sec-hd::before {
+  content: '';
+  width: 4px; height: 16px;
+  background: #43A047;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.ci {
+  width: 100%;
+  background: #fff;
+  border-radius: 11px;
+  border: 1.5px solid #eee;
+  padding: 13px 12px 11px;
+  margin-bottom: 8px;
+  transition: border-color .15s, background .15s;
+}
+.ci.o { border-color: #43A047; background: #F0FBF0; }
+.ci.x { border-color: #E53935; background: #FFEBEE; }
+
+.ci-txt {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #222;
+  margin-bottom: 10px;
+  word-break: keep-all;
+}
+
+.ox { display: flex; gap: 8px; }
+.oxb {
+  flex: 1;
+  padding: 10px 0;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  font-family: inherit;
+  color: #ccc;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all .13s;
+  text-align: center;
+}
+.oxb:active   { transform: scale(.93); }
+.oxb.so { background: #43A047; border-color: #43A047; color: #fff; }
+.oxb.sx { background: #E53935; border-color: #E53935; color: #fff; }
+
+/* ────────────────────────
+   점수 요약
+──────────────────────── */
+#sum-box {
+  width: 100%;
+  background: #2E7D32;
+  border-radius: 14px;
+  padding: 20px 18px;
+  color: #fff;
+  margin-bottom: 12px;
+}
+#s-score { font-size: 42px; font-weight: 700; line-height: 1; }
+#s-max   { font-size: 15px; opacity: .65; margin-top: 4px; }
+#s-pct   { font-size: 13px; opacity: .8;  margin-top: 7px; }
+#s-bars  { margin-top: 14px; }
+.brow { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.blbl { font-size: 10px; width: 70px; text-align: right; opacity: .8; flex-shrink: 0; }
+.btrk { flex: 1; height: 5px; background: rgba(255,255,255,.2); border-radius: 3px; overflow: hidden; }
+.bfll { height: 100%; background: #00E676; border-radius: 3px; transition: width .5s; }
+.bval { font-size: 10px; width: 28px; opacity: .8; }
+
+/* ── 상담 내역 ── */
+.cf { margin-bottom: 14px; }
+.cf:last-child { margin-bottom: 0; }
+.cf label { display: block; font-size: 12px; font-weight: 700; color: #2E7D32; margin-bottom: 6px; }
+.cf textarea {
+  width: 100%;
+  padding: 12px 13px;
+  border: 1.5px solid #C8E6C9;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  height: 70px;
+  outline: none;
+  -webkit-appearance: none;
+}
+.cf textarea:focus { border-color: #43A047; }
+
+/* ── 경고 ── */
+#warn {
+  display: none;
+  background: #FFF8E1;
+  border: 1.5px solid #FFB300;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12px;
+  color: #E65100;
+  margin-bottom: 10px;
+}
+
+/* ── 완료 화면 ── */
+#done-inner { text-align: center; padding: 36px 16px; }
+.done-ico   { font-size: 60px; margin-bottom: 16px; }
+.done-ttl   { font-size: 22px; font-weight: 700; color: #2E7D32; margin-bottom: 10px; }
+.done-sub   { font-size: 13px; color: #777; line-height: 1.7; }
+
+/* ── 하단 버튼 ── */
+#bbar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  width: 100%;
+  background: #fff;
+  padding: 11px 14px;
+  padding-bottom: max(11px, env(safe-area-inset-bottom));
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.09);
+  z-index: 200;
+}
+.btn {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  background: #2E7D32;
+  color: #fff;
+  letter-spacing: -0.2px;
+  transition: background .15s, transform .1s;
+}
+.btn:active { transform: scale(.98); background: #1B5E20; }
+.btn.dim    { background: #81C784; }
+
+/* ── 토스트 ── */
+#toast {
+  position: fixed;
+  bottom: 78px; left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: rgba(0,0,0,0.78);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  opacity: 0;
+  transition: all .25s;
+  z-index: 400;
+  white-space: nowrap;
+  pointer-events: none;
+}
+#toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── 로딩 ── */
+#lding {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.52);
+  z-index: 500;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+#lding.on { display: flex; }
+.spin {
+  width: 42px; height: 42px;
+  border: 4px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: sp .8s linear infinite;
+}
+@keyframes sp { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- 헤더 -->
+<div id="hdr">
+  <h1>🟢 국민매운찜갈비 QSC</h1>
+  <p id="hdr-sub">기본 정보를 입력하고 시작하세요</p>
+  <div id="pbar"><div id="pfill"></div></div>
+</div>
+
+<!-- 카테고리 탭 -->
+<div id="tabs"></div>
+
+<!-- ① 기본정보 -->
+<div class="scr on" id="s-info">
+  <div class="card">
+    <div class="pg-ttl">기본 정보 입력</div>
+    <div class="pg-desc">QSC 체크 시작 전 아래 정보를 입력해주세요.</div>
+    <div class="fld">
+      <label>담당 슈퍼바이저</label>
+      <input type="text" id="i-sv" placeholder="이름을 입력하세요" autocomplete="off" autocorrect="off">
+    </div>
+    <div class="fld">
+      <label>매장명</label>
+      <input type="text" id="i-st" placeholder="예) 하양점" autocomplete="off" autocorrect="off">
+    </div>
+    <div class="fld">
+      <label>방문 날짜</label>
+      <input type="date" id="i-dt">
+    </div>
+  </div>
+</div>
+
+<!-- ② 체크리스트 -->
+<div class="scr" id="s-chk">
+  <div id="chk-body"></div>
+</div>
+
+<!-- ③ 상담내역 + 제출 -->
+<div class="scr" id="s-sub">
+  <div id="sum-box">
+    <div id="s-score">-</div>
+    <div id="s-max">/ 59 점</div>
+    <div id="s-pct"></div>
+    <div id="s-bars"></div>
+  </div>
+  <div class="card">
+    <div class="sec-hd">상담 내역</div>
+    <div class="cf"><label>주요 상담 내용</label><textarea id="c1" placeholder="내용 입력"></textarea></div>
+    <div class="cf"><label>개선 요청 사항</label><textarea id="c2" placeholder="내용 입력"></textarea></div>
+    <div class="cf"><label>특이 사항 / 기타</label><textarea id="c3" placeholder="내용 입력"></textarea></div>
+  </div>
+  <div id="warn"></div>
+</div>
+
+<!-- ④ 완료 -->
+<div class="scr" id="s-done">
+  <div class="card" id="done-inner">
+    <div class="done-ico">✅</div>
+    <div class="done-ttl">제출 완료!</div>
+    <div class="done-sub">QSC 보고서가 저장되었습니다.<br>담당자에게 PDF가 발송되었습니다.</div>
+    <button class="btn" style="margin-top:26px" onclick="doReset()">새 체크리스트 시작</button>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<!-- 하단 버튼 -->
+<div id="bbar"><button class="btn" id="mbtn" onclick="doNext()">다음</button></div>
+<div id="toast"></div>
+<div id="lding"><div class="spin"></div><div>보고서 생성 중...</div></div>
+
+<script>
+/* ══════════════════════════════════════
+   체크리스트 데이터
+══════════════════════════════════════ */
+const CL = [
+  { name:"음식 품질", subs:[
+    { name:"냉장보관 (신선도)", items:[
+      "금일 영업 식자재의 발주량은 체크하고 이상이 없는가?",
+      "냉장고 5도 이하, 냉동고 -18도 이하 적절하게 유지하며 관리하고 있는가?",
+      "식자재의 선입선출이 잘 되고 있으며 유통기한 지난 식자재는 없는가?",
+      "냉동갈비의 핏물은 12시간 이상 제거하고 초벌을 하는가?",
+      "냉동양념소스를 냉장환경에서 충분히 해동하여 사용하는가?",
+      "사용량 이외의 간장 소스는 냉동환경에서 보관하는가?",
+    ]},
+    { name:"갈비", items:[
+      "갈비 초벌과정을 1시간 30분 하였는가?",
+      "초벌과정에서 나오는 불순물들을 수시로 충분히 제거하였는가?",
+      "초벌이 끝난 갈비를 충분히 건조(식힌) 후 보관용 바트로 옮겨 담았는가?",
+    ]},
+    { name:"밥", items:[
+      "준비된 밥의 수량이 과도 또는 과소하지 않은가? 질거나 되지는 않은가?",
+      "일정시간이 지난 밥을 선입선출을 신경 쓰며 관리하는가?",
+      "밥솥의 내솥, 뚜껑, 물받이 등을 관리하는가?",
+    ]},
+    { name:"계란찜", items:[
+      "계란의 보관이 오래되거나 상해서 냄새가 나지는 않는가?",
+      "매뉴얼대로 소금, 설탕, 미원, 정수물을 계량하며 충분히 저어 녹였는가?",
+      "주문이 들어오는 시간 외에는 정확하게 냉장보관을 하는가?",
+      "계란찜 조리 직전 보관통을 충분히 흔들어서 사용하는가?",
+    ]},
+    { name:"개인위생", items:[
+      "주방근무자의 복장은 청결하게 유지하도록 지시하였는가?",
+      "앞치마 또는 유니폼을 착용하였는가?",
+      "조리 시에는 모자를 착용하는가?",
+    ]},
+    { name:"기타", items:[
+      "냉장고 및 작업대 각종 틈새에 이물질 없이 깨끗한가?",
+      "조리가 끝난 후에는 재료보관 바트의 뚜껑을 닫아두는가?",
+      "주방 기물 및 기기에 대한 사전 점검과 고장난 제품은 A/S 진행하였는가?",
+      "창고관리는 잘 되어 있으며 수시로 재고관리를 하고 있는가?",
+    ]},
+  ]},
+  { name:"서비스", subs:[
+    { name:"매장 서비스", items:[
+      "주문 영수증에 형광펜 마커로 꼼꼼히 체크하며 조리하는가?",
+      "고객의 특별 요청사항을 잘 확인하고 응해드렸는가?",
+      "숙박업소 주문 시 확인 후 수저를 챙겨서 보내드렸는가?",
+      "기사가 음식을 픽업한 후 고객에게 픽업문자를 보냈는가?",
+      "2인 이상의 주문이 들어올 경우 인원수에 맞춰 종이컵을 함께 드렸는가?",
+      "평균 조리 완료 시간을 준수하는가? (주문 후 15분 이내)",
+    ]},
+    { name:"전화 서비스", items:[
+      "고객전화가 들어왔을 시 친절한 목소리로 인사문구를 말씀드렸는가?",
+      "매장·메뉴 설명 요청 시 충분히 알아들을 수 있도록 대응하였는가?",
+      "배달 실수에 대한 컴플레인을 받을 시 충분한 사과의 말씀을 전해드렸는가?",
+    ]},
+  ]},
+  { name:"위생", subs:[
+    { name:"주방 위생", items:[
+      "쓰레기를 쌓아두지 않고 자주 배출하는가?",
+      "주방을 수시로 쓸고 마감 시에는 물청소를 하는가?",
+      "기물(가위, 집게, 각종 조리도구)들은 자주 설거지하여 사용하고 있는가?",
+      "조리용 팬은 1회 이상 사용하면 바로 설거지를 하는가?",
+      "모든 솥, 후라이팬 등 바닥의 그을음 관리는 잘 되는가?",
+      "주변 기물들이 원래의 위치에 잘 정리정돈 되어 있는가?",
+      "벌레·파리 등이 들어오지 않도록 외부와의 공간분리를 잘 시켜놓았는가?",
+      "행주·스펀지 등 소모성 위생용품의 교체 주기를 준수하고 있는가?",
+    ]},
+    { name:"홀 위생", items:[
+      "사용한 쓰레기통은 자주 비워주는가?",
+      "홀용 그릇·기물 등에 먼지가 없는지 수시로 확인하고 설거지하는가?",
+      "창문·거울 등에 묻은 게 없는지 확인하고 지워주었는가?",
+      "에어컨에서 먼지가 나오지 않는지 확인하고 필터청소를 주기적으로 하는가?",
+      "테이블, 의자, 수저, 휴지 등 비치항목의 오와 열을 맞추어 정돈해두었는가?",
+      "카운터, 컴퓨터, 포스기기 주변은 청결한가?",
+    ]},
+  ]},
+  { name:"플랫폼 운영", subs:[
+    { name:"플랫폼 운영", items:[
+      "운영시간을 정확하게 지키고 있는가? (배민·쿠팡·땡겨요 등)",
+      "불필요한 운영 일시중지가 없는가?",
+      "지역에 맞는 적정 광고·마케팅 금액을 사용하고 있는가?",
+      "플랫폼 조리시간 적중률은 잘 지켜지고 있는가?",
+      "주문 수락률이 100%인가?",
+      "리뷰 답변을 매일 빠짐없이 작성하고 있는가?",
+      "지정된 휴무일이 정확하게 설정·운영되고 있는가?",
+    ]},
+  ]},
+  { name:"마감", subs:[
+    { name:"마감 점검", items:[
+      "마지막 주문건 완료 전·마감 시 고객에게 픽업문자를 보냈는가?",
+      "냉장고를 제외한 전열기구, 가스밸브, 각종 뚜껑 등의 확인은 하였는가?",
+      "마감 시 전자레인지, 작업대, 화구, 바닥청소 등 청결상태는 확인하였는가?",
+      "식자재·부자재·용기 등 재고는 충분한가? 식자재 발주 체크를 하였는가?",
+      "익일 냉동갈비 냉장 이동 등 해동 세팅을 완료하였는가?",
+      "당일 매출 및 주문 건수 정산을 확인하였는가?",
+    ]},
+  ]},
+];
+
+/* ══════════════════════════════════════
+   상태
+══════════════════════════════════════ */
+const A = {};
+let curCat = 0, step = 0, warnShown = false, total = 0;
+CL.forEach((c,ci) => c.subs.forEach((s,si) => s.items.forEach((_,ii) => {
+  A[`${ci}-${si}-${ii}`] = null; total++;
+})));
+
+const $ = id => document.getElementById(id);
+const fmtDate = v => { const [y,m,d] = v.split('-'); return `${y.slice(2)}.${m}.${d}`; };
+const answered = () => Object.values(A).filter(Boolean).length;
+const catTotal = ci => CL[ci].subs.reduce((a,s) => a + s.items.length, 0);
+const catAnswered = ci => {
+  let n = 0;
+  CL[ci].subs.forEach((s,si) => s.items.forEach((_,ii) => { if(A[`${ci}-${si}-${ii}`]) n++; }));
+  return n;
+};
+
+function showScr(id) {
+  document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+  $(id).classList.add('on');
+  window.scrollTo(0, 0);
+}
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('on');
+  setTimeout(() => t.classList.remove('on'), 2600);
+}
+function updProg() { $('pfill').style.width = Math.round(answered() / total * 100) + '%'; }
+
+/* ── 탭 ── */
+function renderTabs() {
+  const el = $('tabs'); el.innerHTML = '';
+  CL.forEach((c, ci) => {
+    const b = document.createElement('button');
+    b.className = 'tab' + (ci === curCat ? ' on' : '');
+    b.innerHTML = c.name + `<span class="badge">${catAnswered(ci)}/${catTotal(ci)}</span>`;
+    b.onclick = () => { curCat = ci; renderTabs(); renderChk(); window.scrollTo(0, 0); };
+    el.appendChild(b);
+  });
+}
+
+/* ── 체크리스트 ── */
+function renderChk() {
+  const el = $('chk-body'); el.innerHTML = '';
+  CL[curCat].subs.forEach((sub, si) => {
+    const hd = document.createElement('div');
+    hd.className = 'sec-hd'; hd.textContent = sub.name; el.appendChild(hd);
+    sub.items.forEach((txt, ii) => {
+      const key = `${curCat}-${si}-${ii}`, ans = A[key];
+      const d = document.createElement('div');
+      d.className = 'ci' + (ans === 'O' ? ' o' : ans === 'X' ? ' x' : '');
+      d.id = 'ci-' + key;
+      d.innerHTML = `<div class="ci-txt">${txt}</div>
+        <div class="ox">
+          <button class="oxb${ans==='O'?' so':''}" onclick="pick('${key}','O',this)">O</button>
+          <button class="oxb${ans==='X'?' sx':''}" onclick="pick('${key}','X',this)">X</button>
+        </div>`;
+      el.appendChild(d);
+    });
+  });
+}
+
+/* ── O/X 선택 ── */
+function pick(key, val, btn) {
+  A[key] = A[key] === val ? null : val;
+  const ans = A[key];
+  const d = $('ci-' + key);
+  d.className = 'ci' + (ans === 'O' ? ' o' : ans === 'X' ? ' x' : '');
+  d.querySelectorAll('.oxb').forEach(b => b.classList.remove('so','sx'));
+  if (ans === 'O') d.querySelector('.oxb:first-child').classList.add('so');
+  if (ans === 'X') d.querySelector('.oxb:last-child').classList.add('sx');
+  renderTabs(); updProg(); updBtn();
+}
+
+/* ── 버튼 레이블 ── */
+function updBtn() {
+  const b = $('mbtn');
+  if (step !== 1) return;
+  if (curCat < CL.length - 1) {
+    b.textContent = '다음 카테고리 →'; b.className = 'btn';
+  } else {
+    const an = answered();
+    b.textContent = an === total ? '상담내역 작성 →' : `상담내역 작성 (${an}/${total})`;
+    b.className = an === total ? 'btn' : 'btn dim';
+  }
+}
+
+/* ── 점수 요약 ── */
+function renderSum() {
+  let sc = 0; Object.values(A).forEach(v => { if(v === 'O') sc++; });
+  $('s-score').textContent = sc;
+  $('s-max').textContent   = `/ ${total} 점`;
+  $('s-pct').textContent   = `달성률 ${Math.round(sc/total*100)}%`;
+  const bars = $('s-bars'); bars.innerHTML = '';
+  CL.forEach((c, ci) => {
+    const ct = catTotal(ci);
+    const cs = CL[ci].subs.reduce((a,s,si) =>
+      a + s.items.filter((_,ii) => A[`${ci}-${si}-${ii}`] === 'O').length, 0);
+    bars.innerHTML += `<div class="brow">
+      <div class="blbl">${c.name}</div>
+      <div class="btrk"><div class="bfll" style="width:${ct ? Math.round(cs/ct*100) : 0}%"></div></div>
+      <div class="bval">${cs}/${ct}</div></div>`;
+  });
+}
+
+/* ══════════════════════════════════════
+   화면 전환
+══════════════════════════════════════ */
+function doNext() {
+  if (step === 0) {
+    const sv = $('i-sv').value.trim(), st = $('i-st').value.trim(), dt = $('i-dt').value;
+    if (!sv || !st || !dt) { toast('모든 항목을 입력해주세요'); return; }
+    $('hdr-sub').textContent = `${st} · ${fmtDate(dt)} · ${sv}`;
+    step = 1; curCat = 0;
+    $('tabs').style.display = 'block';
+    renderTabs(); renderChk(); showScr('s-chk'); updBtn();
+  } else if (step === 1) {
+    if (curCat < CL.length - 1) {
+      curCat++; renderTabs(); renderChk(); window.scrollTo(0,0); updBtn();
+    } else {
+      step = 2;
+      $('tabs').style.display = 'none';
+      renderSum(); showScr('s-sub');
+      $('mbtn').textContent = '제출하기'; $('mbtn').className = 'btn';
+    }
+  } else if (step === 2) {
+    doSubmit();
+  }
+}
+
+/* ══════════════════════════════════════
+   제출
+══════════════════════════════════════ */
+function doSubmit() {
+  const unan = Object.values(A).filter(v => !v).length;
+  if (unan > 0 && !warnShown) {
+    warnShown = true;
+    const w = $('warn'); w.style.display = 'block';
+    w.textContent = `⚠️ 미응답 항목이 ${unan}건 있습니다. 한 번 더 누르면 제출됩니다.`;
+    toast(`미응답 ${unan}건 — 다시 누르면 제출`); return;
+  }
+  warnShown = false;
+  const sv = $('i-sv').value.trim(), st = $('i-st').value.trim(), dt = $('i-dt').value;
+  const payload = {
+    supervisor: sv, storeName: st, visitDate: fmtDate(dt),
+    consult: [$('c1').value, $('c2').value, $('c3').value],
+    categories: CL.map((c,ci) => ({
+      name: c.name,
+      subcategories: c.subs.map((s,si) => ({
+        name: s.name,
+        items: s.items.map((text,ii) => ({ text, answer: A[`${ci}-${si}-${ii}`] || 'X' }))
+      }))
+    }))
+  };
+  $('lding').classList.add('on');
+  google.script.run
+    .withSuccessHandler(r => {
+      $('lding').classList.remove('on');
+      if (r.success) {
+        step = 3;
+        $('bbar').style.display = 'none';
+        $('tabs').style.display = 'none';
+        showScr('s-done');
+      } else { toast('오류: ' + r.error); }
+    })
+    .withFailureHandler(e => {
+      $('lding').classList.remove('on');
+      toast('실패: ' + e.message);
+    })
+    .submitQSC(payload);
+}
+
+/* ══════════════════════════════════════
+   리셋
+══════════════════════════════════════ */
+function doReset() {
+  Object.keys(A).forEach(k => A[k] = null);
+  step = 0; curCat = 0; warnShown = false;
+  ['i-sv','i-st'].forEach(id => $(id).value = '');
+  $('i-dt').value = new Date().toISOString().split('T')[0];
+  ['c1','c2','c3'].forEach(id => $(id).value = '');
+  $('pfill').style.width = '0%';
+  $('hdr-sub').textContent = '기본 정보를 입력하고 시작하세요';
+  $('warn').style.display = 'none';
+  $('bbar').style.display = 'block';
+  $('mbtn').textContent = '다음'; $('mbtn').className = 'btn';
+  $('tabs').style.display = 'none';
+  showScr('s-info');
+}
+
+/* 초기화 */
+$('i-dt').value = new Date().toISOString().split('T')[0];
+updProg();
+</script>
+</body>
+</html>
